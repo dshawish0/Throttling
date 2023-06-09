@@ -4,5 +4,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProfileRepository {
-    String getProfile();
+    String getProfile() throws InterruptedException;
 }

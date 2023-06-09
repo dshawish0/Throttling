@@ -4,5 +4,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PostsRepository {
-    String getPosts();
+    String getPosts() throws InterruptedException;
 }

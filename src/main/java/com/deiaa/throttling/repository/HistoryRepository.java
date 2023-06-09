@@ -4,5 +4,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HistoryRepository {
-    String getHistory();
+    String getHistory() throws InterruptedException;
 }
