@@ -14,7 +14,7 @@ public class PostsService implements PostsRepository{
     @Autowired
     private HttpServletRequest request;
 
-    private final ThrottleStrategy throttleStrategy;
+    private ThrottleStrategy throttleStrategy;
 
     public PostsService() {
         this.throttleStrategy = new NoThrottlingStrategy();
@@ -33,5 +33,13 @@ public class PostsService implements PostsRepository{
         this.throttleStrategy.throttleRequest(request.getRemoteAddr(), fullUrl);
 
         return fullUrl;
+    }
+
+    public void setThrottleStrategy() {
+        this.throttleStrategy = new NoThrottlingStrategy();
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
     }
 }

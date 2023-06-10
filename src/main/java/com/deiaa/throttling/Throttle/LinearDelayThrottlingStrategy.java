@@ -24,7 +24,7 @@ public class LinearDelayThrottlingStrategy implements ThrottleStrategy{
 
         int requestCount = rateLimiterMap.get(ipAddress).get(endPoint).get();
 
-        if(requestCount > 10 && shouldSlowDown(ipAddress, endPoint))
+        if(requestCount >= 10 && shouldSlowDown(ipAddress, endPoint))
             slowDownRequest();
 
         System.out.println(rateLimiterMap);
@@ -41,7 +41,7 @@ public class LinearDelayThrottlingStrategy implements ThrottleStrategy{
             if (elapsedTime < 60000) {
                 return true;
             } else {
-                rateLimiterMap.get(ipAddress).get(endPoint).set(1);
+                rateLimiterMap.get(ipAddress).get(endPoint).set(0);
             }
         }
 

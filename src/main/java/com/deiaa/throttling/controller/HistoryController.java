@@ -23,4 +23,8 @@ public class HistoryController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("503 Service Unavailable");
         }
     }
+
+    public void setHistoryService(HistoryService mockHistoryService) {
+        this.historyService = mockHistoryService;
+    }
 }

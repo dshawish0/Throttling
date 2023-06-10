@@ -18,4 +18,8 @@ public class ProfileController {
     public ResponseEntity<String> getProfile() throws InterruptedException {
         return ResponseEntity.ok(profileService.getProfile());
     }
+
+    public void setProfileService(ProfileService mockProfileService) {
+        this.profileService = mockProfileService;
+    }
 }

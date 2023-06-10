@@ -19,4 +19,8 @@ public class PostsController {
     public ResponseEntity<String> getPosts() throws InterruptedException {
         return ResponseEntity.ok(postsService.getPosts());
     }
+
+    public void setPostService(PostsService mockPostsService) {
+        this.postsService = mockPostsService;
+    }
 }

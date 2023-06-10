@@ -21,12 +21,12 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
     public void throttleRequest(String ipAddress, String endPoint) throws InterruptedException {
 
         rateLimiterMap.computeIfAbsent(ipAddress, k -> new HashMap<>())
-                .computeIfAbsent(endPoint, k -> new AtomicInteger(1))
+                .computeIfAbsent(endPoint, k -> new AtomicInteger(0))
                 .incrementAndGet();
 
         int requestCount = rateLimiterMap.get(ipAddress).get(endPoint).get();
 
-        if(requestCount > 30 && shouldSlowDown(ipAddress, endPoint))
+        if(requestCount >= 30 && shouldSlowDown(ipAddress, endPoint))
             slowDownRequest();
 
         System.out.println(rateLimiterMap);
@@ -43,7 +43,7 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
             if (elapsedTime < 60000) {
                 return true;
             } else {
-                rateLimiterMap.get(ipAddress).get(endPoint).set(1);
+                rateLimiterMap.get(ipAddress).get(endPoint).set(0);
                 atomicInteger.set(0);
 
             }

@@ -1,6 +1,7 @@
 package com.deiaa.throttling.service;
 
 import com.deiaa.throttling.Throttle.DynamicRequestThrottlingStrategy;
+import com.deiaa.throttling.Throttle.LinearDelayThrottlingStrategy;
 import com.deiaa.throttling.Throttle.ThrottleStrategy;
 import com.deiaa.throttling.repository.HistoryRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ public class HistoryService implements HistoryRepository {
     @Autowired
     private HttpServletRequest request;
 
-    private final ThrottleStrategy throttleStrategy;
+    private ThrottleStrategy throttleStrategy;
 
     public HistoryService() {
         this.throttleStrategy = new DynamicRequestThrottlingStrategy();
@@ -34,5 +35,13 @@ public class HistoryService implements HistoryRepository {
         this.throttleStrategy.throttleRequest(request.getRemoteAddr(), fullUrl);
 
         return fullUrl;
+    }
+
+    public void setThrottleStrategy() {
+        this.throttleStrategy = new DynamicRequestThrottlingStrategy();
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
     }
 }

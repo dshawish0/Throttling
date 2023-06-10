@@ -14,7 +14,7 @@ public class ProfileService implements ProfileRepository {
     @Autowired
     private HttpServletRequest request;
 
-    private final ThrottleStrategy throttleStrategy;
+    private ThrottleStrategy throttleStrategy;
 
     public ProfileService() {
         this.throttleStrategy = new LinearDelayThrottlingStrategy();
@@ -33,5 +33,13 @@ public class ProfileService implements ProfileRepository {
         this.throttleStrategy.throttleRequest(request.getRemoteAddr(), fullUrl);
 
         return fullUrl;
+    }
+
+    public void setThrottleStrategy() {
+        this.throttleStrategy = new LinearDelayThrottlingStrategy();
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
     }
 }
