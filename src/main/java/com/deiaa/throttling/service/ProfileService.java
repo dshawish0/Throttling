@@ -30,12 +30,13 @@ public class ProfileService implements ProfileRepository {
                 .toUriString();
 
         String fullUrl = baseUrl + request.getRequestURI();
+
         this.throttleStrategy.throttleRequest(request.getRemoteAddr(), fullUrl);
 
         return fullUrl;
     }
 
-    public void setThrottleStrategy() {
+    public synchronized void setThrottleStrategy() {
         this.throttleStrategy = new LinearDelayThrottlingStrategy();
     }
 

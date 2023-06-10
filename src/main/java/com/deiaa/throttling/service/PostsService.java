@@ -35,7 +35,7 @@ public class PostsService implements PostsRepository{
         return fullUrl;
     }
 
-    public void setThrottleStrategy() {
+    public synchronized void setThrottleStrategy() {
         this.throttleStrategy = new NoThrottlingStrategy();
     }
 
