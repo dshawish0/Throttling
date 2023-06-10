@@ -8,12 +8,12 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
 
     private final Map<String, Map<String, AtomicInteger>> rateLimiterMap;
     private final Map<String, Map<String, Long>> timestampMap;
-    private final Map <String, AtomicInteger> throttledRequests;
+    private final Map <String, Map<String, AtomicInteger>> throttledRequests;
 
     public DynamicRequestThrottlingStrategy() {
         this.rateLimiterMap = new HashMap<>();
-        timestampMap = new HashMap<>();
-        throttledRequests = new HashMap<>();
+        this.timestampMap = new HashMap<>();
+        this.throttledRequests = new HashMap<>();
 
     }
 
@@ -24,12 +24,13 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
                 .computeIfAbsent(endPoint, k -> new AtomicInteger(0))
                 .incrementAndGet();
 
-        throttledRequests.computeIfAbsent(ipAddress, k -> new AtomicInteger(0));
+        throttledRequests.computeIfAbsent(ipAddress, k -> new HashMap<>())
+                .computeIfAbsent(endPoint, k -> new AtomicInteger(0));
 
         int requestCount = rateLimiterMap.get(ipAddress).get(endPoint).get();
 
         if(requestCount >= 30 && shouldSlowDown(ipAddress, endPoint))
-            slowDownRequest(ipAddress);
+            slowDownRequest(ipAddress, endPoint);
 
         System.out.println(rateLimiterMap);
     }
@@ -46,7 +47,7 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
                 return true;
             } else {
                 rateLimiterMap.get(ipAddress).get(endPoint).set(0);
-                throttledRequests.get(ipAddress).set(0);
+                throttledRequests.get(ipAddress).get(endPoint).set(0);
 
             }
         }
@@ -56,16 +57,16 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
     }
 
 
-    private void slowDownRequest(String ipAddress) throws InterruptedException {
-        int currentCount = throttledRequests.get(ipAddress).incrementAndGet();
+    private void slowDownRequest(String ipAddress, String endPoint) throws InterruptedException {
+        int currentCount = throttledRequests.get(ipAddress).get(endPoint).incrementAndGet();
         System.out.println(currentCount);
         if (currentCount > 30) {
-            throttledRequests.get(ipAddress).decrementAndGet();
+            throttledRequests.get(ipAddress).get(endPoint).decrementAndGet();
             throw new InterruptedException("Service Unavailable");
         }
 
         Thread.sleep(3000);
-        throttledRequests.get(ipAddress).decrementAndGet();
+        throttledRequests.get(ipAddress).get(endPoint).decrementAndGet();
 
     }
 
