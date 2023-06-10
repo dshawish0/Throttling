@@ -8,12 +8,12 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
 
     private final Map<String, Map<String, AtomicInteger>> rateLimiterMap;
     private final Map<String, Map<String, Long>> timestampMap;
-    private final AtomicInteger atomicInteger;
+    private final Map <String, AtomicInteger> throttledRequests;
 
     public DynamicRequestThrottlingStrategy() {
         this.rateLimiterMap = new HashMap<>();
         timestampMap = new HashMap<>();
-        atomicInteger = new AtomicInteger(0);
+        throttledRequests = new HashMap<>();
 
     }
 
@@ -24,10 +24,12 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
                 .computeIfAbsent(endPoint, k -> new AtomicInteger(0))
                 .incrementAndGet();
 
+        throttledRequests.computeIfAbsent(ipAddress, k -> new AtomicInteger(0));
+
         int requestCount = rateLimiterMap.get(ipAddress).get(endPoint).get();
 
         if(requestCount >= 30 && shouldSlowDown(ipAddress, endPoint))
-            slowDownRequest();
+            slowDownRequest(ipAddress);
 
         System.out.println(rateLimiterMap);
     }
@@ -44,7 +46,7 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
                 return true;
             } else {
                 rateLimiterMap.get(ipAddress).get(endPoint).set(0);
-                atomicInteger.set(0);
+                throttledRequests.get(ipAddress).set(0);
 
             }
         }
@@ -54,16 +56,16 @@ public class DynamicRequestThrottlingStrategy implements ThrottleStrategy{
     }
 
 
-    private void slowDownRequest() throws InterruptedException {
-        int currentCount = atomicInteger.incrementAndGet();
+    private void slowDownRequest(String ipAddress) throws InterruptedException {
+        int currentCount = throttledRequests.get(ipAddress).incrementAndGet();
         System.out.println(currentCount);
         if (currentCount > 30) {
-            atomicInteger.decrementAndGet();
+            throttledRequests.get(ipAddress).decrementAndGet();
             throw new InterruptedException("Service Unavailable");
         }
 
         Thread.sleep(3000);
-        atomicInteger.decrementAndGet();
+        throttledRequests.get(ipAddress).decrementAndGet();
 
     }
 
